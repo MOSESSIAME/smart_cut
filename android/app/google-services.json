@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "253700404304",
+    "project_id": "smart-cut-6f3c0",
+    "storage_bucket": "smart-cut-6f3c0.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:253700404304:android:c98517550759763fc54d55",
+        "android_client_info": {
+          "package_name": "com.moses.smart_cut"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAyNNOr4cSE-S5EqKNy8cnDHLeayQQf-IQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
