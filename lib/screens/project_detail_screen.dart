@@ -172,23 +172,25 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
         { 'section': 'Lockstyle', 'qty': 2, 'size': (height - 30).round() },
         { 'section': 'Interlock', 'qty': 2, 'size': (height - 30).round() },
         { 'section': 'Wheelsash', 'qty': 4, 'size': ((width - 170) / 2).round() },
-        { 'section': 'Glass', 'qty': 2, 'size': '${((width - 170) / 2 + 15).round()} x ${(height - 30 - 85).round()}' },
+        { 'section': 'Glass', 'qty': 2, 'size': '${(((width - 170) / 2) + 15).round()} x ${((height - 30) - 85).round()}' },
+        { 'section': 'Fly Screen', 'qty': 1, 'size': '${(((width - 170) / 2) + 90).round()} x ${(height - 18).round()}' }
       ];
     } else if (type == '3-panel') {
       return [
-        { 'section': 'Top', 'qty': 1, 'size': (width - 80).round() },
-        { 'section': 'Bottom', 'qty': 1, 'size': (width - 40).round() },
+        { 'section': 'Top', 'qty': 1, 'size': (width - 60).round() },
+        { 'section': 'Bottom', 'qty': 1, 'size': (width - 20).round() },
         { 'section': 'Jamb', 'qty': 2, 'size': height.round() },
         { 'section': 'Lockstyle', 'qty': 2, 'size': (height - 30).round() },
-        { 'section': 'Interlock', 'qty': 2, 'size': (height - 30).round() },
-        { 'section': 'Wheelsash', 'qty': 6, 'size': ((width - 250) / 3).round() },
-        { 'section': 'Glass', 'qty': 3, 'size': '${((width - 250) / 3 + 15).round()} x ${(height - 30 - 85).round()}' },
+        { 'section': 'Interlock', 'qty': 4, 'size': (height - 30).round() },
+        { 'section': 'Wheelsash', 'qty': 6, 'size': ((width - 200) / 3).round() },
+        { 'section': 'Glass', 'qty': 3, 'size': '${(((width - 200) / 3) + 15).round()} x ${(height - 30 - 85).round()}' },
+        { 'section': 'Fly Screen', 'qty': 2, 'size': '${(((width - 200) / 3) + 90).round()} x ${(height - 18).round()}' }
       ];
     } else if (type == 'casement') {
       return [
-        { 'section': 'Top', 'qty': 1, 'size': (width - 50).round() },
-        { 'section': 'Bottom', 'qty': 1, 'size': (width - 30).round() },
-        { 'section': 'Jamb', 'qty': 2, 'size': height.round() },
+        { 'section': 'Outer', 'qty': 4, 'size': (width).round() },
+        { 'section': 'Inner', 'qty': 4, 'size': (width - 45).round() },
+        { 'section': 'Glass', 'qty': 1, 'size': '${(((width - 45)-68)).round()} x ${(((width - 45)-68)).round()}' }
       ];
     } else {
       return [];

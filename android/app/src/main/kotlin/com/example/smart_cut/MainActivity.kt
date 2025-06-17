@@ -1,4 +1,4 @@
-package com.example.smart_cut
+package com.moses.smart_cut
 
 import io.flutter.embedding.android.FlutterActivity
 

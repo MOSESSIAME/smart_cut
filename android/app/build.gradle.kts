@@ -1,14 +1,12 @@
 plugins {
     id("com.android.application")
     id("kotlin-android")
-    id("com.google.gms.google-services") // ✅ Firebase plugin
     id("dev.flutter.flutter-gradle-plugin") // Flutter plugin last
 }
 
 android {
     namespace = "com.moses.smart_cut"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = "29.0.13599879" // ✅ actual NDK version here
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -28,7 +26,14 @@ android {
     }
 
     buildTypes {
+        debug {
+            isMinifyEnabled = false
+            isShrinkResources = false
+            signingConfig = signingConfigs.getByName("debug")
+        }
         release {
+            isMinifyEnabled = false
+            isShrinkResources = false
             signingConfig = signingConfigs.getByName("debug")
         }
     }
@@ -36,4 +41,11 @@ android {
 
 flutter {
     source = "../.."
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
 }
