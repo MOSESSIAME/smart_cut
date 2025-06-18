@@ -183,31 +183,51 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
   List<Map<String, dynamic>> _generateCuttingResult(String type, double width, double height) {
     if (type == '2-panel') {
       return [
-        { 'section': 'Top', 'qty': 1, 'size': (width - 60).round() },
-        { 'section': 'Bottom', 'qty': 1, 'size': (width - 20).round() },
-        { 'section': 'Jamb', 'qty': 2, 'size': height.round() },
-        { 'section': 'Lockstyle', 'qty': 2, 'size': (height - 30).round() },
-        { 'section': 'Interlock', 'qty': 2, 'size': (height - 30).round() },
-        { 'section': 'Wheelsash', 'qty': 4, 'size': ((width - 170) / 2).round() },
-        { 'section': 'Glass', 'qty': 2, 'size': '${(((width - 170) / 2) + 15).round()} x ${((height - 30) - 85).round()}' },
-        { 'section': 'Fly Screen', 'qty': 1, 'size': '${(((width - 170) / 2) + 90).round()} x ${(height - 18).round()}' }
+        {'section': 'Top', 'qty': 1, 'size': (width - 60).round()},
+        {'section': 'Bottom', 'qty': 1, 'size': (width - 20).round()},
+        {'section': 'Jamb', 'qty': 2, 'size': height.round()},
+        {'section': 'Lockstyle', 'qty': 2, 'size': (height - 30).round()},
+        {'section': 'Interlock', 'qty': 2, 'size': (height - 30).round()},
+        {'section': 'Wheelsash', 'qty': 4, 'size': ((width - 170) / 2).round()},
+        {
+          'section': 'Glass',
+          'qty': 2,
+          'size': '${(((width - 170) / 2) + 15).round()} x ${((height - 30) - 85).round()}'
+        },
+        {
+          'section': 'Fly Screen',
+          'qty': 1,
+          'size': '${(((width - 170) / 2) + 90).round()} x ${(height - 18).round()}'
+        }
       ];
     } else if (type == '3-panel') {
       return [
-        { 'section': 'Top', 'qty': 1, 'size': (width - 60).round() },
-        { 'section': 'Bottom', 'qty': 1, 'size': (width - 20).round() },
-        { 'section': 'Jamb', 'qty': 2, 'size': height.round() },
-        { 'section': 'Lockstyle', 'qty': 2, 'size': (height - 30).round() },
-        { 'section': 'Interlock', 'qty': 4, 'size': (height - 30).round() },
-        { 'section': 'Wheelsash', 'qty': 6, 'size': ((width - 200) / 3).round() },
-        { 'section': 'Glass', 'qty': 3, 'size': '${(((width - 200) / 3) + 15).round()} x ${(height - 30 - 85).round()}' },
-        { 'section': 'Fly Screen', 'qty': 2, 'size': '${(((width - 200) / 3) + 90).round()} x ${(height - 18).round()}' }
+        {'section': 'Top', 'qty': 1, 'size': (width - 60).round()},
+        {'section': 'Bottom', 'qty': 1, 'size': (width - 20).round()},
+        {'section': 'Jamb', 'qty': 2, 'size': height.round()},
+        {'section': 'Lockstyle', 'qty': 2, 'size': (height - 30).round()},
+        {'section': 'Interlock', 'qty': 4, 'size': (height - 30).round()},
+        {'section': 'Wheelsash', 'qty': 6, 'size': ((width - 200) / 3).round()},
+        {
+          'section': 'Glass',
+          'qty': 3,
+          'size': '${(((width - 200) / 3) + 15).round()} x ${(height - 30 - 85).round()}'
+        },
+        {
+          'section': 'Fly Screen',
+          'qty': 2,
+          'size': '${(((width - 200) / 3) + 90).round()} x ${(height - 18).round()}'
+        }
       ];
     } else if (type == 'casement') {
       return [
-        { 'section': 'Outer', 'qty': 4, 'size': (width).round() },
-        { 'section': 'Inner', 'qty': 4, 'size': (width - 45).round() },
-        { 'section': 'Glass', 'qty': 1, 'size': '${(((width - 45) - 68)).round()} x ${(((width - 45) - 68)).round()}' }
+        {'section': 'Outer', 'qty': 4, 'size': (width).round()},
+        {'section': 'Inner', 'qty': 4, 'size': (width - 45).round()},
+        {
+          'section': 'Glass',
+          'qty': 1,
+          'size': '${(((width - 45) - 68)).round()} x ${(((width - 45) - 68)).round()}'
+        }
       ];
     } else {
       return [];
@@ -278,7 +298,36 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
                             ),
                             IconButton(
                               icon: Icon(Icons.delete, color: Colors.red),
-                              onPressed: () => _deleteItem(item),
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: Text('Delete Item'),
+                                      content: Text(
+                                        'Are you sure you want to delete this item? This action cannot be undone.',
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () =>
+                                              Navigator.of(context).pop(),
+                                          child: Text('Cancel'),
+                                        ),
+                                        ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.red,
+                                          ),
+                                          onPressed: () {
+                                            Navigator.of(context).pop(); // Close dialog
+                                            _deleteItem(item); // Proceed to delete
+                                          },
+                                          child: Text('Delete'),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
                             ),
                           ],
                         )
