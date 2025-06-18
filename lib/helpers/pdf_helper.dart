@@ -5,17 +5,23 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import '../models/project.dart';
 
+/// Helper class for generating and saving PDF documents related to projects.
 class PdfHelper {
+  /// Generates a PDF cutting sheet for the given [project] and saves it to external storage.
+  /// Also opens the share dialog for the generated PDF.
   static Future<void> generateAndSave(Project project) async {
-    final pdf = pw.Document();
+    final pdf = pw.Document(); // Create a new PDF document instance
 
+    // Add a single page to the document
     pdf.addPage(
       pw.Page(
         pageFormat: PdfPageFormat.a4,
         build: (pw.Context context) {
+          // Build the page content as a vertical column
           return pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
+              // Title text with project name
               pw.Text(
                 'Cutting Sheet for: ${project.name}',
                 style: pw.TextStyle(
@@ -23,8 +29,11 @@ class PdfHelper {
                   fontWeight: pw.FontWeight.bold,
                 ),
               ),
+              // Location text
               pw.Text('Location: ${project.location}'),
-              pw.SizedBox(height: 20),
+              pw.SizedBox(height: 20), // Spacer
+
+              // Table with cutting sheet data
               pw.Table(
                 border: pw.TableBorder.all(width: 1, color: PdfColors.black),
                 defaultVerticalAlignment: pw.TableCellVerticalAlignment.middle,
@@ -36,6 +45,7 @@ class PdfHelper {
                   4: pw.FlexColumnWidth(3),
                 },
                 children: [
+                  // Header row for the table
                   pw.TableRow(
                     decoration: pw.BoxDecoration(color: PdfColors.grey300),
                     children: [
@@ -46,19 +56,25 @@ class PdfHelper {
                       _tableCell('Cutting', isHeader: true),
                     ],
                   ),
+                  // Data rows: one for each item in the project
                   ...List<pw.TableRow>.generate(
                     project.items.length,
                     (index) {
                       final item = project.items[index];
                       return pw.TableRow(
                         children: [
+                          // Row number
                           _tableCell((index + 1).toString()),
+                          // Window type
                           _tableCell(item.windowType),
+                          // Width (rounded)
                           _tableCell(item.width.toStringAsFixed(0)),
+                          // Height (rounded)
                           _tableCell(item.height.toStringAsFixed(0)),
+                          // Cutting details, now as: section : size (qty)
                           _tableCell(
                             item.cuttingResult
-                                .map((e) => '${e['section']}: ${e['qty']}x${_formatSize(e['size'])}')
+                                .map((e) => '${e['section']} : ${_formatSize(e['size'])} (${e['qty']})')
                                 .join('\n'),
                           ),
                         ],
@@ -73,18 +89,19 @@ class PdfHelper {
       ),
     );
 
-    // Get directory to save file
+    // Get the external storage directory to save the PDF file
     final directory = await getExternalStorageDirectory();
     final filePath = '${directory!.path}/CuttingSheet_${project.name}.pdf';
 
-    // Save PDF file
+    // Save the PDF file to the specified path
     final file = File(filePath);
     await file.writeAsBytes(await pdf.save());
 
-    // Open share dialog
+    // Open the share dialog so the user can share the generated PDF
     await Printing.sharePdf(bytes: await pdf.save(), filename: 'CuttingSheet_${project.name}.pdf');
   }
 
+  /// Helper method to create a table cell with padding and optional bold text for headers.
   static pw.Widget _tableCell(String text, {bool isHeader = false}) {
     return pw.Padding(
       padding: const pw.EdgeInsets.all(6),
@@ -98,6 +115,7 @@ class PdfHelper {
     );
   }
 
+  /// Formats the [size] value as a rounded string if numeric, otherwise as a plain string.
   static String _formatSize(dynamic size) {
     if (size is num) {
       return size.toStringAsFixed(0);
