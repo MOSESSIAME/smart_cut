@@ -5,8 +5,10 @@ import '../models/project_item.dart';
 import '../helpers/storage_helper.dart';
 import '../helpers/pdf_helper.dart';
 
+/// This screen displays project details, allows editing, adding items,
+/// generating PDFs, and saving project changes.
 class ProjectDetailScreen extends StatefulWidget {
-  final Project project;
+  final Project project; // The project being displayed/edited
 
   ProjectDetailScreen({required this.project});
 
@@ -15,24 +17,26 @@ class ProjectDetailScreen extends StatefulWidget {
 }
 
 class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
-  late Project _currentProject;
-  final List<String> _windowTypes = ['2-panel', '3-panel', 'casement'];
+  late Project _currentProject; // Holds the current working project
+  final List<String> _windowTypes = ['2-panel', '3-panel', 'casement']; // Window types available
 
   @override
   void initState() {
     super.initState();
-    _currentProject = widget.project;
+    _currentProject = widget.project; // Initialize the current project from the passed data
   }
 
+  /// Saves the current project to storage (SharedPreferences or file)
   void _save() async {
-    final projects = await StorageHelper.loadProjects();
-    final index = projects.indexWhere((p) => p.id == _currentProject.id);
+    final projects = await StorageHelper.loadProjects(); // Load saved projects
+    final index = projects.indexWhere((p) => p.id == _currentProject.id); // Find current project
     if (index != -1) {
-      projects[index] = _currentProject;
-      await StorageHelper.saveProjects(projects);
+      projects[index] = _currentProject; // Update the project in list
+      await StorageHelper.saveProjects(projects); // Save updated list
     }
   }
 
+  /// Opens a dialog to edit project name and location
   void _editProjectDetails() {
     final nameController = TextEditingController(text: _currentProject.name);
     final locationController = TextEditingController(text: _currentProject.location);
@@ -44,10 +48,12 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            // Project name input
             TextField(
               controller: nameController,
               decoration: InputDecoration(labelText: 'Project Name'),
             ),
+            // Location input
             TextField(
               controller: locationController,
               decoration: InputDecoration(labelText: 'Location'),
@@ -55,10 +61,12 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
           ],
         ),
         actions: [
+          // Cancel button
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text('Cancel'),
           ),
+          // Save button
           ElevatedButton(
             onPressed: () {
               setState(() {
@@ -75,6 +83,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
     );
   }
 
+  /// Opens a dialog to add or edit a project item (window/door)
   void _addOrEditItem({ProjectItem? item}) {
     String selectedWindowType = item?.windowType ?? _windowTypes[0];
     final widthController = TextEditingController(text: item != null ? item.width.toString() : '');
@@ -87,6 +96,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
         content: SingleChildScrollView(
           child: Column(
             children: [
+              // Dropdown for window type
               DropdownButtonFormField<String>(
                 value: selectedWindowType,
                 items: _windowTypes.map((type) {
@@ -99,11 +109,13 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
                 },
                 decoration: InputDecoration(labelText: 'Window Type'),
               ),
+              // Width input
               TextField(
                 controller: widthController,
                 decoration: InputDecoration(labelText: 'Width'),
                 keyboardType: TextInputType.number,
               ),
+              // Height input
               TextField(
                 controller: heightController,
                 decoration: InputDecoration(labelText: 'Height'),
@@ -123,9 +135,11 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
               final height = double.tryParse(heightController.text) ?? 0;
 
               if (width > 0 && height > 0) {
+                // Generate cutting sheet result
                 final cuttingResult = _generateCuttingResult(selectedWindowType, width, height);
 
                 if (item == null) {
+                  // Add new item
                   final newItem = ProjectItem(
                     id: Uuid().v4(),
                     windowType: selectedWindowType,
@@ -137,6 +151,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
                     _currentProject.items.add(newItem);
                   });
                 } else {
+                  // Edit existing item
                   setState(() {
                     item.windowType = selectedWindowType;
                     item.width = width;
@@ -156,6 +171,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
     );
   }
 
+  /// Deletes an item from the project
   void _deleteItem(ProjectItem item) {
     setState(() {
       _currentProject.items.removeWhere((i) => i.id == item.id);
@@ -163,6 +179,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
     _save();
   }
 
+  /// Generates cutting sheet data based on window type and size
   List<Map<String, dynamic>> _generateCuttingResult(String type, double width, double height) {
     if (type == '2-panel') {
       return [
@@ -190,7 +207,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
       return [
         { 'section': 'Outer', 'qty': 4, 'size': (width).round() },
         { 'section': 'Inner', 'qty': 4, 'size': (width - 45).round() },
-        { 'section': 'Glass', 'qty': 1, 'size': '${(((width - 45)-68)).round()} x ${(((width - 45)-68)).round()}' }
+        { 'section': 'Glass', 'qty': 1, 'size': '${(((width - 45) - 68)).round()} x ${(((width - 45) - 68)).round()}' }
       ];
     } else {
       return [];
@@ -203,12 +220,14 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
       appBar: AppBar(
         title: Text(_currentProject.name),
         actions: [
+          // PDF generation button
           IconButton(
             icon: Icon(Icons.print),
             onPressed: () {
-              PdfHelper.generateAndPrint(_currentProject);
+              PdfHelper.generateAndSave(_currentProject);
             },
           ),
+          // Edit project details button
           IconButton(
             icon: Icon(Icons.edit),
             onPressed: _editProjectDetails,
@@ -228,11 +247,13 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // Item summary
                         Text(
                           '${item.windowType.toUpperCase()} | Width: ${item.width} | Height: ${item.height}',
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         SizedBox(height: 8),
+                        // Cutting result table
                         DataTable(
                           columns: [
                             DataColumn(label: Text('Section')),
@@ -247,6 +268,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
                             ]);
                           }).toList(),
                         ),
+                        // Edit / Delete buttons
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
@@ -266,6 +288,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
                 );
               },
             ),
+      // Floating button to add new item
       floatingActionButton: FloatingActionButton(
         onPressed: () => _addOrEditItem(),
         child: Icon(Icons.add),
