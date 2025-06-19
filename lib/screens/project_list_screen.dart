@@ -4,14 +4,16 @@ import '../helpers/storage_helper.dart';
 import 'project_detail_screen.dart';
 import 'package:uuid/uuid.dart';
 
-/// The main screen that lists all projects and allows adding, viewing, or deleting them.
+/// The main screen that lists all projects and allows adding, viewing, deleting, or searching them.
 class ProjectListScreen extends StatefulWidget {
   @override
   State<ProjectListScreen> createState() => _ProjectListScreenState();
 }
 
 class _ProjectListScreenState extends State<ProjectListScreen> {
-  List<Project> _projects = []; // List of all projects
+  List<Project> _projects = []; // All projects loaded from storage
+  List<Project> _filteredProjects = []; // Projects filtered based on search input
+  String _searchQuery = ''; // Current search query
 
   @override
   void initState() {
@@ -24,6 +26,24 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
     final projects = await StorageHelper.loadProjects();
     setState(() {
       _projects = projects;
+      _filteredProjects = _applySearchFilter(projects, _searchQuery);
+    });
+  }
+
+  /// Applies search filter to the list of projects based on name or location.
+  List<Project> _applySearchFilter(List<Project> projects, String query) {
+    if (query.isEmpty) return projects;
+    final lowerQuery = query.toLowerCase();
+    return projects.where((p) =>
+        p.name.toLowerCase().contains(lowerQuery) ||
+        p.location.toLowerCase().contains(lowerQuery)).toList();
+  }
+
+  /// Updates the filtered projects list based on search query.
+  void _onSearchChanged(String query) {
+    setState(() {
+      _searchQuery = query;
+      _filteredProjects = _applySearchFilter(_projects, query);
     });
   }
 
@@ -68,6 +88,7 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
                 );
                 setState(() {
                   _projects.add(newProject); // Add new project to the list
+                  _filteredProjects = _applySearchFilter(_projects, _searchQuery); // Update filtered list
                 });
                 StorageHelper.saveProjects(_projects); // Save updated list to storage
                 Navigator.pop(context); // Close dialog
@@ -84,6 +105,7 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
   void _deleteProject(Project project) {
     setState(() {
       _projects.remove(project); // Remove project from the list
+      _filteredProjects = _applySearchFilter(_projects, _searchQuery); // Update filtered list
     });
     StorageHelper.saveProjects(_projects); // Save updated list to storage
   }
@@ -125,34 +147,52 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
       appBar: AppBar(
         title: Text('My Projects'),
       ),
-      body: _projects.isEmpty
-          // Show a message if there are no projects
-          ? Center(child: Text('No projects yet. Tap + to add.'))
-          // Otherwise, show a scrollable list of projects
-          : ListView.builder(
-              itemCount: _projects.length,
-              itemBuilder: (context, index) {
-                final p = _projects[index];
-                return ListTile(
-                  title: Text(p.name),         // Project name
-                  subtitle: Text(p.location),  // Project location
-                  // Tap on project opens detail screen
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => ProjectDetailScreen(project: p),
-                      ),
-                    ).then((_) => _loadProjects()); // Reload projects on return
-                  },
-                  // Delete icon with confirmation dialog
-                  trailing: IconButton(
-                    icon: Icon(Icons.delete, color: Colors.red),
-                    onPressed: () => _confirmDeleteProject(p),
-                  ),
-                );
-              },
+      body: Column(
+        children: [
+          // Search field at the top
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              decoration: InputDecoration(
+                labelText: 'Search by name or location',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.search),
+              ),
+              onChanged: _onSearchChanged,
             ),
+          ),
+          Expanded(
+            child: _filteredProjects.isEmpty
+                // Show a message if there are no projects
+                ? Center(child: Text('No projects yet. Tap + to add.'))
+                // Otherwise, show a scrollable list of filtered projects
+                : ListView.builder(
+                    itemCount: _filteredProjects.length,
+                    itemBuilder: (context, index) {
+                      final p = _filteredProjects[index];
+                      return ListTile(
+                        title: Text(p.name),         // Project name
+                        subtitle: Text(p.location),  // Project location
+                        // Tap on project opens detail screen
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => ProjectDetailScreen(project: p),
+                            ),
+                          ).then((_) => _loadProjects()); // Reload projects on return
+                        },
+                        // Delete icon with confirmation dialog
+                        trailing: IconButton(
+                          icon: Icon(Icons.delete, color: Colors.red),
+                          onPressed: () => _confirmDeleteProject(p),
+                        ),
+                      );
+                    },
+                  ),
+          ),
+        ],
+      ),
       // Floating action button to add a new project
       floatingActionButton: FloatingActionButton(
         onPressed: _addProject,
