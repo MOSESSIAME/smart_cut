@@ -71,7 +71,7 @@ class WelcomeScreen extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(bottom: 16.0),
               child: Text(
-                '© Moses Siame 2025', // Copyright notice
+                'Copyright © Moses Siame 2025', // Copyright notice
                 style: const TextStyle(
                   color: Colors.white70,
                   fontSize: 14,
