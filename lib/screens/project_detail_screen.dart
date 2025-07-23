@@ -3,10 +3,10 @@ import 'package:uuid/uuid.dart';
 import '../models/project.dart';
 import '../models/project_item.dart';
 import '../helpers/storage_helper.dart';
-import '../helpers/pdf_helper.dart';
+import '../cutting_sheet_pdf_preview.dart'; // << Add this import
 
 /// This screen displays project details, allows editing, adding items,
-/// generating PDFs, and saving project changes.
+/// generates PDFs via preview screen, and saves project changes.
 class ProjectDetailScreen extends StatefulWidget {
   final Project project; // The project being displayed/edited
 
@@ -240,11 +240,17 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
       appBar: AppBar(
         title: Text(_currentProject.name),
         actions: [
-          // PDF generation button
+          // PDF preview/print/share button
           IconButton(
             icon: Icon(Icons.print),
+            tooltip: "Print / Share PDF",
             onPressed: () {
-              PdfHelper.generateAndSave(_currentProject);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => CuttingSheetPdfPreview(project: _currentProject),
+                ),
+              );
             },
           ),
           // Edit project details button
