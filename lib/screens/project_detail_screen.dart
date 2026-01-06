@@ -18,18 +18,25 @@ class ProjectDetailScreen extends StatefulWidget {
 
 class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
   late Project _currentProject; // Holds the current working project
-  final List<String> _windowTypes = ['2-panel', '3-panel', 'casement']; // Window types available
+  final List<String> _windowTypes = [
+    '2-panel',
+    '3-panel',
+    'casement',
+  ]; // Window types available
 
   @override
   void initState() {
     super.initState();
-    _currentProject = widget.project; // Initialize the current project from the passed data
+    _currentProject =
+        widget.project; // Initialize the current project from the passed data
   }
 
   /// Saves the current project to storage (SharedPreferences or file)
   void _save() async {
     final projects = await StorageHelper.loadProjects(); // Load saved projects
-    final index = projects.indexWhere((p) => p.id == _currentProject.id); // Find current project
+    final index = projects.indexWhere(
+      (p) => p.id == _currentProject.id,
+    ); // Find current project
     if (index != -1) {
       projects[index] = _currentProject; // Update the project in list
       await StorageHelper.saveProjects(projects); // Save updated list
@@ -39,7 +46,9 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
   /// Opens a dialog to edit project name and location
   void _editProjectDetails() {
     final nameController = TextEditingController(text: _currentProject.name);
-    final locationController = TextEditingController(text: _currentProject.location);
+    final locationController = TextEditingController(
+      text: _currentProject.location,
+    );
 
     showDialog(
       context: context,
@@ -86,8 +95,12 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
   /// Opens a dialog to add or edit a project item (window/door)
   void _addOrEditItem({ProjectItem? item}) {
     String selectedWindowType = item?.windowType ?? _windowTypes[0];
-    final widthController = TextEditingController(text: item != null ? item.width.toString() : '');
-    final heightController = TextEditingController(text: item != null ? item.height.toString() : '');
+    final widthController = TextEditingController(
+      text: item != null ? item.width.toString() : '',
+    );
+    final heightController = TextEditingController(
+      text: item != null ? item.height.toString() : '',
+    );
 
     showDialog(
       context: context,
@@ -136,7 +149,11 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
 
               if (width > 0 && height > 0) {
                 // Generate cutting sheet result
-                final cuttingResult = _generateCuttingResult(selectedWindowType, width, height);
+                final cuttingResult = _generateCuttingResult(
+                  selectedWindowType,
+                  width,
+                  height,
+                );
 
                 if (item == null) {
                   // Add new item
@@ -180,7 +197,11 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
   }
 
   /// Generates cutting sheet data based on window type and size
-  List<Map<String, dynamic>> _generateCuttingResult(String type, double width, double height) {
+  List<Map<String, dynamic>> _generateCuttingResult(
+    String type,
+    double width,
+    double height,
+  ) {
     if (type == '2-panel') {
       return [
         {'section': 'Top', 'qty': 1, 'size': (width - 60).round()},
@@ -192,13 +213,15 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
         {
           'section': 'Glass',
           'qty': 2,
-          'size': '${(((width - 170) / 2) + 15).round()} x ${((height - 30) - 85).round()}'
+          'size':
+              '${(((width - 170) / 2) + 15).round()} x ${((height - 30) - 85).round()}',
         },
         {
           'section': 'Fly Screen',
           'qty': 1,
-          'size': '${(((width - 170) / 2) + 90).round()} x ${(height - 18).round()}'
-        }
+          'size':
+              '${(((width - 170) / 2) + 90).round()} x ${(height - 18).round()}',
+        },
       ];
     } else if (type == '3-panel') {
       return [
@@ -211,23 +234,28 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
         {
           'section': 'Glass',
           'qty': 3,
-          'size': '${(((width - 200) / 3) + 15).round()} x ${(height - 30 - 85).round()}'
+          'size':
+              '${(((width - 200) / 3) + 15).round()} x ${(height - 30 - 85).round()}',
         },
         {
           'section': 'Fly Screen',
           'qty': 2,
-          'size': '${(((width - 200) / 3) + 90).round()} x ${(height - 18).round()}'
-        }
+          'size':
+              '${(((width - 200) / 3) + 90).round()} x ${(height - 18).round()}',
+        },
       ];
     } else if (type == 'casement') {
       return [
-        {'section': 'Outer', 'qty': 4, 'size': (width).round()},
-        {'section': 'Inner', 'qty': 4, 'size': (width - 45).round()},
+        {'section': 'Outer-Width', 'qty': 2, 'size': (width).round()},
+        {'section': 'Outer-Height', 'qty': 2, 'size': (height).round()},
+        {'section': 'Inner-Width', 'qty': 2, 'size': (width - 45).round()},
+        {'section': 'Inner-Height', 'qty': 2, 'size': (height - 45).round()},
         {
           'section': 'Glass',
           'qty': 1,
-          'size': '${(((width - 45) - 68)).round()} x ${(((width - 45) - 68)).round()}'
-        }
+          'size':
+              '${(((width - 45) - 68)).round()} x ${(((height - 45) - 68)).round()}',
+        },
       ];
     } else {
       return [];
@@ -248,16 +276,14 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => CuttingSheetPdfPreview(project: _currentProject),
+                  builder: (_) =>
+                      CuttingSheetPdfPreview(project: _currentProject),
                 ),
               );
             },
           ),
           // Edit project details button
-          IconButton(
-            icon: Icon(Icons.edit),
-            onPressed: _editProjectDetails,
-          ),
+          IconButton(icon: Icon(Icons.edit), onPressed: _editProjectDetails),
         ],
       ),
       body: _currentProject.items.isEmpty
@@ -287,11 +313,13 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
                             DataColumn(label: Text('Size')),
                           ],
                           rows: item.cuttingResult.map((part) {
-                            return DataRow(cells: [
-                              DataCell(Text(part['section'].toString())),
-                              DataCell(Text(part['qty'].toString())),
-                              DataCell(Text(part['size'].toString())),
-                            ]);
+                            return DataRow(
+                              cells: [
+                                DataCell(Text(part['section'].toString())),
+                                DataCell(Text(part['qty'].toString())),
+                                DataCell(Text(part['size'].toString())),
+                              ],
+                            );
                           }).toList(),
                         ),
                         // Edit / Delete buttons
@@ -324,8 +352,12 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
                                             backgroundColor: Colors.red,
                                           ),
                                           onPressed: () {
-                                            Navigator.of(context).pop(); // Close dialog
-                                            _deleteItem(item); // Proceed to delete
+                                            Navigator.of(
+                                              context,
+                                            ).pop(); // Close dialog
+                                            _deleteItem(
+                                              item,
+                                            ); // Proceed to delete
                                           },
                                           child: Text('Delete'),
                                         ),
@@ -336,7 +368,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
                               },
                             ),
                           ],
-                        )
+                        ),
                       ],
                     ),
                   ),

@@ -1,25 +1,22 @@
 import 'package:flutter/material.dart';
 
-/// The welcome screen of the app.
-/// Includes a gradient background, app icon, title, "Get Started" button,
-/// and a footer with copyright.
 class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Main app background with gradient
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.teal, Colors.green], // Gradient from teal to green
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFF0D47A1), // Deep Blue
+              Color(0xFFE3F2FD), // Light Blue / White
+            ],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
           ),
         ),
-        // Use Column to position main content and footer
         child: Column(
           children: [
-            // Expanded so main content is centered vertically
             Expanded(
               child: Center(
                 child: Padding(
@@ -27,38 +24,59 @@ class WelcomeScreen extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // App icon
-                      const Icon(
-                        Icons.construction,
-                        color: Colors.white,
-                        size: 100,
-                      ),
+                      // App Logo Image
+                      Image.asset('assets/images/CutLogo2.png', height: 100),
+
                       const SizedBox(height: 20),
-                      // App title
+
+                      // App Title
                       const Text(
                         'SMART CUT',
                         style: TextStyle(
                           fontSize: 36,
-                          color: Colors.white,
                           fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          letterSpacing: 1.5,
                         ),
                       ),
+
+                      const SizedBox(height: 16),
+
+                      // Description Text
+                      const Text(
+                        'Welcome to Smart Cut — the smart way to generate aluminium cutting sheets, optimize layouts, and minimize material waste.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.white70,
+                          height: 1.5,
+                        ),
+                      ),
+
                       const SizedBox(height: 40),
-                      // "Get Started" button
+
+                      // Get Started Button
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 48,
+                            vertical: 16,
+                          ),
                           backgroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          elevation: 6,
                         ),
                         onPressed: () {
-                          // Navigate to the projects screen
                           Navigator.pushReplacementNamed(context, '/projects');
                         },
                         child: const Text(
                           'Get Started',
                           style: TextStyle(
-                            color: Colors.teal,
+                            color: Color(0xFF0D47A1),
                             fontSize: 18,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
@@ -67,15 +85,13 @@ class WelcomeScreen extends StatelessWidget {
                 ),
               ),
             ),
-            // Footer copyright section
+
+            // Footer
             Padding(
               padding: const EdgeInsets.only(bottom: 16.0),
               child: Text(
-                'Copyright © Moses Siame 2025', // Copyright notice
-                style: const TextStyle(
-                  color: Colors.white70,
-                  fontSize: 14,
-                ),
+                '© Smart Cut 2025',
+                style: TextStyle(color: Colors.blueGrey, fontSize: 14),
               ),
             ),
           ],

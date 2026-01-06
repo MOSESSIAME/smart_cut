@@ -12,14 +12,17 @@ class SmartCutApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'SMART CUT',
-      debugShowCheckedModeBanner: false, // Hide the debug banner in the top right corner
+      debugShowCheckedModeBanner:
+          false, // Hide the debug banner in the top right corner
       theme: ThemeData(
         primarySwatch: Colors.teal, // Set the primary theme color
-        visualDensity: VisualDensity.adaptivePlatformDensity, // Adaptive density for different platforms
+        visualDensity: VisualDensity
+            .adaptivePlatformDensity, // Adaptive density for different platforms
       ),
       home: WelcomeScreen(), // The first screen shown when the app launches
       routes: {
-        '/projects': (context) => ProjectListScreen(), // Route for the project list screen
+        '/projects': (context) =>
+            ProjectListScreen(), // Route for the project list screen
       },
     );
   }

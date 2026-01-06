@@ -9,10 +9,8 @@ import '../models/project.dart';
 class CuttingSheetPdfPreview extends StatefulWidget {
   final Project project;
 
-  const CuttingSheetPdfPreview({
-    Key? key,
-    required this.project,
-  }) : super(key: key);
+  const CuttingSheetPdfPreview({Key? key, required this.project})
+    : super(key: key);
 
   @override
   State<CuttingSheetPdfPreview> createState() => _CuttingSheetPdfPreviewState();
@@ -41,81 +39,94 @@ class _CuttingSheetPdfPreviewState extends State<CuttingSheetPdfPreview> {
     final doc = pw.Document();
 
     doc.addPage(
-      pw.Page(
+      pw.MultiPage(
         pageFormat: format,
-        margin: pw.EdgeInsets.all(16),
-        build: (pw.Context context) {
-          return pw.Column(
-            crossAxisAlignment: pw.CrossAxisAlignment.stretch,
-            children: [
-              pw.Text(
-                'Cutting Sheet',
-                style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 18),
-              ),
-              pw.SizedBox(height: 10),
-              pw.Text('Project: ${widget.project.name}', style: pw.TextStyle(fontSize: 12)),
-              pw.Text('Location: ${widget.project.location}', style: pw.TextStyle(fontSize: 12)),
-              pw.Text('Date: ${DateTime.now().toLocal().toString().split(' ')[0]}', style: pw.TextStyle(fontSize: 12)),
-              pw.SizedBox(height: 18),
-              ...widget.project.items.map((item) {
-                return pw.Column(
-                  crossAxisAlignment: pw.CrossAxisAlignment.start,
-                  children: [
-                    pw.Text(
-                      '${item.windowType.toUpperCase()} | Width: ${item.width} | Height: ${item.height}',
-                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
-                    ),
-                    pw.Table(
-                      border: pw.TableBorder.all(),
-                      columnWidths: {
-                        0: pw.FlexColumnWidth(2),
-                        1: pw.FlexColumnWidth(1),
-                        2: pw.FlexColumnWidth(2),
-                      },
-                      children: [
-                        pw.TableRow(
-                          decoration: pw.BoxDecoration(color: PdfColors.grey300),
-                          children: [
-                            pw.Padding(
-                              padding: pw.EdgeInsets.all(4),
-                              child: pw.Text('Section', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10)),
-                            ),
-                            pw.Padding(
-                              padding: pw.EdgeInsets.all(4),
-                              child: pw.Text('Qty', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10)),
-                            ),
-                            pw.Padding(
-                              padding: pw.EdgeInsets.all(4),
-                              child: pw.Text('Size', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10)),
-                            ),
-                          ],
-                        ),
-                        ...item.cuttingResult.map<pw.TableRow>((part) {
-                          return pw.TableRow(
-                            children: [
-                              pw.Padding(
-                                padding: pw.EdgeInsets.all(4),
-                                child: pw.Text(part['section'].toString(), style: pw.TextStyle(fontSize: 10)),
-                              ),
-                              pw.Padding(
-                                padding: pw.EdgeInsets.all(4),
-                                child: pw.Text(part['qty'].toString(), style: pw.TextStyle(fontSize: 10)),
-                              ),
-                              pw.Padding(
-                                padding: pw.EdgeInsets.all(4),
-                                child: pw.Text(part['size'].toString(), style: pw.TextStyle(fontSize: 10)),
-                              ),
-                            ],
-                          );
-                        }).toList(),
-                      ],
-                    ),
-                    pw.SizedBox(height: 18),
-                  ],
-                );
-              }).toList(),
-            ],
+        margin: const pw.EdgeInsets.all(16),
+
+        /// ✅ PAGE FOOTER (PAGE NUMBERS)
+        footer: (context) {
+          return pw.Align(
+            alignment: pw.Alignment.center,
+            child: pw.Text(
+              'Page ${context.pageNumber} of ${context.pagesCount}',
+              style: const pw.TextStyle(fontSize: 9),
+            ),
           );
+        },
+
+        build: (pw.Context context) {
+          return [
+            pw.Text(
+              'Cutting Sheet',
+              style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 18),
+            ),
+            pw.SizedBox(height: 8),
+            pw.Text(
+              'Project: ${widget.project.name}',
+              style: const pw.TextStyle(fontSize: 12),
+            ),
+            pw.Text(
+              'Location: ${widget.project.location}',
+              style: const pw.TextStyle(fontSize: 12),
+            ),
+            pw.Text(
+              'Date: ${DateTime.now().toLocal().toString().split(' ')[0]}',
+              style: const pw.TextStyle(fontSize: 12),
+            ),
+            pw.SizedBox(height: 18),
+
+            /// ✅ ITEM NUMBERING
+            ...widget.project.items.asMap().entries.map((entry) {
+              final index = entry.key;
+              final item = entry.value;
+
+              return pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  pw.Text(
+                    '${index + 1}. ${item.windowType.toUpperCase()} '
+                    '| Width: ${item.width.toStringAsFixed(0)} '
+                    '| Height: ${item.height.toStringAsFixed(0)}',
+                    style: pw.TextStyle(
+                      fontWeight: pw.FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                  pw.SizedBox(height: 6),
+                  pw.Table(
+                    border: pw.TableBorder.all(),
+                    columnWidths: {
+                      0: const pw.FlexColumnWidth(2),
+                      1: const pw.FlexColumnWidth(1),
+                      2: const pw.FlexColumnWidth(2),
+                    },
+                    children: [
+                      pw.TableRow(
+                        decoration: const pw.BoxDecoration(
+                          color: PdfColors.grey300,
+                        ),
+                        children: [
+                          _headerCell('Section'),
+                          _headerCell('Size'),
+                          _headerCell('Qty'),
+                        ],
+                      ),
+                      ...item.cuttingResult.map<pw.TableRow>((part) {
+                        return pw.TableRow(
+                          children: [
+                            _bodyCell(part['section'].toString()),
+                            _bodyCell(part['size'].toString()),
+                            _bodyCell(part['qty'].toString()),
+                          ],
+                        );
+                      }).toList(),
+                    ],
+                  ),
+                  pw.SizedBox(height: 18),
+                ],
+              );
+            }).toList(),
+          ];
         },
       ),
     );
@@ -123,19 +134,34 @@ class _CuttingSheetPdfPreviewState extends State<CuttingSheetPdfPreview> {
     return doc.save();
   }
 
+  static pw.Widget _headerCell(String text) {
+    return pw.Padding(
+      padding: const pw.EdgeInsets.all(4),
+      child: pw.Text(
+        text,
+        style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10),
+      ),
+    );
+  }
+
+  static pw.Widget _bodyCell(String text) {
+    return pw.Padding(
+      padding: const pw.EdgeInsets.all(4),
+      child: pw.Text(text, style: const pw.TextStyle(fontSize: 10)),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Cutting Sheet PDF Preview'),
-      ),
+      appBar: AppBar(title: const Text('Cutting Sheet PDF Preview')),
       body: Column(
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: TextField(
               controller: _filenameController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'PDF Filename',
                 suffixIcon: Icon(Icons.edit),
                 border: OutlineInputBorder(),
